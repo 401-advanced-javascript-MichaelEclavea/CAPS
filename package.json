@@ -1,0 +1,26 @@
+{
+  "name": "caps",
+  "version": "1.0.0",
+  "description": "## Requirements:",
+  "main": "caps.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/401-advanced-javascript-MichaelEclavea/CAPS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/401-advanced-javascript-MichaelEclavea/CAPS/issues"
+  },
+  "homepage": "https://github.com/401-advanced-javascript-MichaelEclavea/CAPS#readme"
+}
