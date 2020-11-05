@@ -1,25 +1,54 @@
+
 'use strict';
+
+
+// TCP library (built into node)
 const net = require('net');
+
 const client = new net.Socket();
+
 const host = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 3000;
-client.connect(PORT, host, () => console.log('client connected on port', PORT))
+const port = process.env.PORT || 3000;
+client.connect(port, host, () => { console.log('server is up', port)});
+const EE = require('events');
+const eventMgr = new EE();
+
+eventMgr.on('delivered', handleDelivery)
 
 
 client.on('data', function (data) {
   let event = JSON.parse(data);
-  if(event.event === 'pickup')
-  console.log(new Date().toUTCString(), event.event, event.payload);
+  if (event.event === 'delivered') {
+    console.log(event.event, event.payload.orderID);
+  }
+  if (event.event === 'delivered') {
+    eventMgr.emit('delivered', event.payload);
+  }
 });
 
-function sendMessage(text) {
-  console.log('sending', text);
-  let message = `${text}`;
-  let event = JSON.stringify({ event: 'message', payload: message });
-  client.write(event);
+function sendPickupMessage(eventType, orderInfo) {
+  console.log('sending', eventType);
+  let event = JSON.stringify({ event: eventType, payload: orderInfo });
+  
+  setInterval(() => {
+    client.write(event);
+  }, 5000);
+  
 }
-let msg = 'flowers'
- sendMessage(msg);
-client.on('close', function () {
-  console.log('Connection closed');
-});
+
+let order = {
+  store: '1-206-flowers',
+  orderID: '0123',
+  customer: 'Captain America',
+  address: 'WalaWala st, Blv.'
+}
+
+function handleDelivery(payload) {
+  let event = JSON.stringify({ event: 'Thank you for delivering', payload: payload });
+  setTimeout(() => {
+    client.write(event)
+  }, 1000);
+}
+
+//every 5 seconds send a message that has a pickup event
+sendPickupMessage('pickup', order);

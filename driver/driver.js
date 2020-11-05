@@ -1,19 +1,34 @@
+
 'use strict';
-const net = require('net');
-const client = new net.Socket();
 
-const host = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 3000;
+const ioClient = require('socket.io-client');
 
-client.connect(PORT, host, () => console.log('client connected on port', PORT))
+const client = ioClient('ws://localhost:3000');
+const EE = require('events');
+const eventMgr = new EE();
 
-let messages = [];
 
-client.on('data', function (data) {
-  let event = JSON.parse(data);
-  console.log(new Date().toUTCString(), event.event, event.payload);
+client.on('connect', () => {
+  console.log('vendor connected');
+
+  client.on('message', function (data) {
+    console.log(data.event, data.payload.orderID);
+    if (data.event === 'pickup') {
+      handlePickup(data);
+    }  
+  });
 });
 
-client.on('close', function () {
-  console.log('Connection closed');
-});
+
+
+function handlePickup(payload) {
+  let data = { event: 'in-transit', payload: payload.payload };
+  setTimeout(() => {
+    client.emit('message', data)
+  }, 1000);
+  let data2 = { event: 'delivered', payload: payload.payload };
+  setTimeout(() => {
+    client.emit('message', data2)
+  }, 3000);
+
+}
